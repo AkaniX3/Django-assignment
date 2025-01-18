@@ -7,6 +7,7 @@ import random
 import string
 from django.http import HttpResponse, Http404
 from django.contrib.auth.models import User 
+from django.shortcuts import render
 
 def home(request):
     return HttpResponse("Hello world")
@@ -77,3 +78,13 @@ class ReferralView(APIView):
             })
 
         return Response(referred_user_details, status=status.HTTP_200_OK)
+
+
+def register_page(request):
+    return render(request, 'register.html')
+
+def login_page(request):
+    return render(request, 'login.html')
+
+def referral_page(request):
+    return render(request, 'referral.html')

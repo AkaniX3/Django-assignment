@@ -1,11 +1,26 @@
 from django.contrib import admin
 from django.urls import path
-from accounts.views import UserRegistrationView, UserLoginView, home, ReferralView
+from accounts.views import (
+    UserRegistrationView, 
+    UserLoginView, 
+    home, 
+    ReferralView,
+    register_page,
+    login_page,
+    referral_page,
+)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', home, name='home'),
-    path('register/', UserRegistrationView.as_view(), name='user-registration'),
-    path('login/', UserLoginView.as_view(), name='user-login'),
-    path('referrals/<str:referral_code>/', ReferralView.as_view(), name='user-referral'),
+
+    # Frontend
+    path('register/', register_page, name='register_page'),
+    path('login/', login_page, name='login_page'),
+    path('referral/', referral_page, name='referral_page'),
+
+    # Endpoints
+    path('api/register/', UserRegistrationView.as_view(), name='user-registration'),
+    path('api/login/', UserLoginView.as_view(), name='user-login'),
+    path('api/referrals/<str:referral_code>/', ReferralView.as_view(), name='user-referral'),
 ]
