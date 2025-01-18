@@ -7,5 +7,5 @@ urlpatterns = [
     path('', home, name='home'),
     path('register/', UserRegistrationView.as_view(), name='user-registration'),
     path('login/', UserLoginView.as_view(), name='user-login'),
-    path('referral/', ReferralView.as_view(), name='user-referral'),
+    path('referrals/<str:referral_code>/', ReferralView.as_view(), name='user-referral'),
 ]
