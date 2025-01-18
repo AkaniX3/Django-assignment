@@ -16,11 +16,6 @@ logger = logging.getLogger(__name__)
 def generate_referral_code(length=6):
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))
 
-
-def home(request):
-    return HttpResponse("Hello world")
-
-
 class UserRegistrationView(APIView):
     def post(self, request):
         logger.info("Incoming request for registration: %s", request.data)
@@ -109,6 +104,9 @@ class ReferralView(APIView):
         logger.info("Retrieved referred users for referral code: %s", referral_code)
         return Response(referred_user_details, status=status.HTTP_200_OK)
 
+
+def home_page(request):
+    return render(request, 'home.html')
 
 def register_page(request):
     return render(request, 'register.html')

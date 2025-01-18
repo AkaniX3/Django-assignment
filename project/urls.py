@@ -3,8 +3,8 @@ from django.urls import path
 from accounts.views import (
     UserRegistrationView, 
     UserLoginView, 
-    home, 
     ReferralView,
+    home_page,
     register_page,
     login_page,
     referral_page,
@@ -12,7 +12,7 @@ from accounts.views import (
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', home, name='home'),
+    path('', home_page, name='home_page'),
 
     # Frontend
     path('register/', register_page, name='register_page'),
