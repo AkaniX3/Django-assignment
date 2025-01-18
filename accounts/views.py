@@ -9,34 +9,46 @@ from django.http import HttpResponse, Http404
 from django.contrib.auth.models import User 
 from django.shortcuts import render
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 def home(request):
     return HttpResponse("Hello world")
 
 class UserRegistrationView(APIView):
     def post(self, request):
-        referral_code = request.data.get('referral_code', None)
-        if referral_code:
-            try:
-                referrer = UserProfile.objects.get(referral_code=referral_code)
-            except UserProfile.DoesNotExist:
-                return Response({'detail': 'Invalid referral code.'}, status=status.HTTP_400_BAD_REQUEST)
-        else:
+        logger.info("Incoming request data: %s", request.data)
+        try:
+            referral_code = request.data.get('referral_code', None)
             referrer = None
+            if referral_code:
+                try:
+                    referrer = UserProfile.objects.get(referral_code=referral_code)
+                except UserProfile.DoesNotExist:
+                    return Response({'detail': 'Invalid referral code.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        user = User.objects.create_user(
-            username=request.data.get('email'),
-            email=request.data.get('email'),
-            password=request.data.get('password')
-        )
+            user = User.objects.create_user(
+                username=request.data.get('email'),
+                email=request.data.get('email'),
+                password=request.data.get('password')
+            )
 
-        serializer = UserProfileSerializer(data=request.data)
-        if serializer.is_valid():
-            referral_code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
-            user_profile = serializer.save(user=user, referral_code=referral_code, referred_by=referrer)
+            serializer = UserProfileSerializer(data=request.data)
+            if serializer.is_valid():
+                generated_code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+                user_profile = serializer.save(user=user, referral_code=generated_code, referred_by=referrer)
 
-            return Response({'message': 'User registered successfully!', 'referral_code': referral_code}, status=status.HTTP_201_CREATED)
+                return Response(
+                    {'message': 'User registered successfully!', 'referral_code': generated_code},
+                    status=status.HTTP_201_CREATED
+                )
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        except Exception as e:
+            logger.error(f"Error during registration: {e}")
+            return Response({'detail': 'Internal server error.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class UserLoginView(APIView):
